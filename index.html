@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="lo">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ສູກສັນວັນຄົບຮອບ 3 ປີ ❤️ ຕຸ່ນນ້ອຍ</title>
+
+    <style>
+  :root {
+    --pink1: #ff5aa6;
+    --pink2: #ffd1e6;
+    --pink3: #ffe9f3;
+    --ink: #222;
+    --muted: #666;
+    --card: #ffffff;
+    --shadow: 0 18px 60px rgba(0, 0, 0, 0.18);
+    --radius: 24px;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent; /* ลบสีฟ้าเวลาคลิกบนมือถือ */
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family:
+      "Phetsarath OT",
+      "Noto Sans Lao",
+      system-ui,
+      -apple-system,
+      Segoe UI,
+      sans-serif;
+    background:
+      radial-gradient(
+        1000px 700px at 50% 35%,
+        var(--pink3),
+        transparent 60%
+      ),
+      linear-gradient(135deg, var(--pink1), var(--pink2));
+    overflow-x: hidden; /* ป้องกันจอส่ายไปมา */
+  }
+
+  /* --- Hearts Animation --- */
+  .hearts {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .heart {
+    position: absolute;
+    opacity: 0.9;
+    filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.15));
+    animation: floatUp linear forwards;
+    will-change: transform, opacity;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0) scale(0.9) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.9; }
+    100% { transform: translateY(-115vh) scale(1.35) rotate(18deg); opacity: 0; }
+  }
+
+  /* --- Wrapper & Screen Layout --- */
+  .wrap {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px; /* เว้นขอบจอสำหรับมือถือ */
+  }
+
+  .screen {
+    width: 100%;
+    max-width: 420px; /* ขนาดมาตรฐานมือถือและจอเล็ก */
+    border-radius: 34px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--shadow);
+    transition: max-width 0.3s ease;
+  }
+
+  /* ปรับขนาดเมื่ออยู่บนหน้าจอใหญ่ เช่น iPad หรือ Notebook */
+  @media (min-width: 768px) {
+    .screen {
+      max-width: 460px; /* ให้จอใหญ่ขึ้นนิดหน่อยในแท็บเล็ตและคอม */
+      padding: 24px;
+    }
+    .topTitle { font-size: 1.5rem; }
+    .typing { font-size: 16px !important; }
+  }
+
+  .topTitle {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    margin: 0 0 15px;
+    text-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  }
+
+  /* --- Start Screen --- */
+  .start {
+    display: grid;
+    place-items: center;
+    gap: 15px;
+    padding: 30px 10px;
+  }
+  .bigHeart {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+    display: grid;
+    place-items: center;
+    transition: transform 0.1s ease;
+  }
+  .bigHeart:active { transform: scale(0.92); }
+  .bigHeart span { font-size: 45px; }
+  .startHint {
+    color: white;
+    font-size: 14px;
+    text-align: center;
+    line-height: 1.6;
+    opacity: 0.95;
+  }
+
+  /* --- Reader & Cards --- */
+  .reader { display: none; }
+  .reader.show { display: block; }
+
+  .viewport {
+    overflow: hidden;
+    border-radius: var(--radius);
+    touch-action: pan-y;
+    width: 100%;
+  }
+  .track {
+    display: flex;
+    width: 100%;
+    will-change: transform;
+  }
+  .page {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .photo {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1; /* บังคับให้เป็นจัตุรัสทุกหน้าจอ */
+    background: #f4f4f4;
+    overflow: hidden;
+  }
+  .photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Pop animation */
+  .photo.pop img {
+    animation: popZoom 0.55s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  }
+  @keyframes popZoom {
+    0% { transform: scale(0.92); }
+    70% { transform: scale(1.07); }
+    100% { transform: scale(1.03); }
+  }
+
+  .content {
+    padding: 16px;
+    color: var(--ink);
+  }
+  .badgeRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .badge {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #fff0f7;
+    color: #c2185b;
+    border: 1px solid #ffd1e6;
+    font-weight: 800;
+  }
+  .pageNo { font-size: 12px; color: var(--muted); font-weight: 700; }
+  .title { font-size: 18px; margin: 0 0 8px; font-weight: 900; }
+
+  .textBox {
+    min-height: 140px; /* ล็อกความสูงกัน Card กระตุก */
+    display: block;
+  }
+  .typing {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .caret {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background: #ff4f93;
+    animation: blink 0.9s infinite;
+    vertical-align: middle;
+    margin-left: 2px;
+  }
+  @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+
+  /* --- Progress Bar --- */
+  .barWrap { padding: 0 16px 12px; }
+  .bar {
+    height: 6px;
+    background: #f2f2f2;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  #barFill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff4f93, #ff9ac7);
+    transition: width 0.3s ease;
+  }
+
+  /* --- Controls (ปุ่มกด) --- */
+  .controls {
+    display: flex;
+    flex-wrap: wrap; /* ให้ปุ่มเรียงใหม่ถ้าจอแคบมาก */
+    gap: 8px;
+    justify-content: center;
+    padding: 0 10px 15px;
+  }
+  .btn {
+    border: none;
+    cursor: pointer;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-weight: 900;
+    background: rgba(255, 255, 255, 0.95);
+    color: #ff2b72;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    transition: transform 0.1s;
+  }
+  .btn:active { transform: scale(0.95); }
+  .btnGhost {
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(5px);
+    box-shadow: none;
+  }
+
+  .tip {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 12px;
+    color: white;
+    opacity: 0.9;
+  }
+</style>
+  </head>
+
+  <body>
+    <div class="hearts" id="hearts"></div>
+    <audio id="bgm" src="song.mp3" autoplay loop preload="auto"></audio>
+
+    <div class="wrap">
+      <div class="screen">
+        <div class="topTitle">ຄົບຮອບ 3 ປີ ❤️ ຕຸ່ນນ້ອຍ</div>
+
+        <!-- START -->
+        <div class="start" id="start">
+          <button class="bigHeart" id="startBtn" aria-label="Start">
+            <span>💗</span>
+          </button>
+          <div class="startHint">ກົດເລີ່ມເພງແລະກົດຫົວໃຈເພື່ອເລີ່ມ…<br /></div>
+        </div>
+
+        <!-- READER -->
+        <div class="reader" id="reader">
+          <div class="viewport" id="viewport">
+            <div class="track" id="track"></div>
+          </div>
+
+          <div class="barWrap">
+            <div class="bar"><div id="barFill"></div></div>
+          </div>
+
+          <div class="controls">
+            <button class="btn" id="prevBtn">‹</button>
+            <button class="btn" id="nextBtn">›</button>
+            <button class="btn btnGhost" id="playBtn">ເລີ່ມເພງ 🎶</button>
+            <button class="btn btnGhost" id="moreHeartsBtn">ຫົວໃຈ 💞</button>
+            <button class="btn btnGhost" id="skipBtn">........</button>
+          </div>
+
+          <div class="tip">ເລື່ອນຊ້າຍ/ຂວາ ເພື່ອອ່ານເທື່ອລະໜ້າ 💌</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const herName = "ຕຸ່ນນ້ອຍ";
+
+      // ✅ 15 หน้า (ยาวขึ้น)
+      const pages = [
+        {
+          img: "card1.png",
+          title: "ສຸກສັນຄົບຮອບ 3 ປີ",
+          text: `${herName}… 3 ປີແລ້ວເນາະທີ່ຢູ່ນຳກັນມາ 🥹
+ຕັ້ງແຕ່ມື້ແລກທີ່ຮູ້ຈັກ ເຂົາຮຸ້ສຶກວ່າເທີເປັນຄົນທີ່ຫນ້າຮັກເລີຍລະ
+ເປັນຄົນທີ່ ຮູ້ສຶກວ່ານ່າຈະເຂົ້າກັນໄດ້ ❤️`,
+        },
+
+        {
+          img: "card2.png",
+          text: `ເຂົາມີຄວາມລັບ 1 ຢ່າງ…
+ເຂົາກວນເທີ ເພາະເຂົາມັກເວລາເທີຍິ້ມ 😳💗
+ຖ້າມື້ໃດເຂົາກວນຫຼາຍໄປ… ຂໍໂທດນຳເດີ,
+ແຕ່ເຂົາກະຍັງຊິກວນເທີຕໍ່ໄປ 😝`,
+        },
+
+        {
+          img: "card3.png",
+          text: `ເຂົາບໍ່ຮູ້ອະນາຄົດຈະເປັນແນວໃດ…
+ແຕ່ເຂົາຮູ້ແນ່ນອນຢ່າງໜຶ່ງ:
+ເຂົາຈະຢູ່ຂ້າງເທີ ເວລາເທີຍິ້ມ ແລະເວລາເທີເມື່ອຍ.
+ຈັບມືເຂົາແນ່ນໆເດີ 💞`,
+        },
+
+        {
+          img: "card4.png",
+          text: `ຖ້າໃຫ້ຍ້ອນເວລາກັບໄປ…
+ເຂົາກໍຈະເລືອກເທີອີກເທື່ອ.
+ບໍ່ແມ່ນເພາະມັນງ່າຍ… ແຕ່ເພາະ “ເລືືອກເທີເຮັດໃຫ້ເຂົາມີຄວາມສູກ” 🥹❤️`,
+        },
+
+        {
+          img: "card5.png",
+          text: `ເທີຮູ້ບໍ?
+ເຂົາຕິດເທີກວ່າ Wi-Fi ອີກ 😂
+ບໍ່ມີເທີ = ສັນຍານອ່ອນ
+ມີເທີ = ໃຈເຕັມຂີດ ❤️`,
+        },
+
+        {
+          img: "card7.png",
+          text: `ເຂົາເລືອກເທີ…
+ໃນວັນທີ່ດີ ແລະວັນທີ່ເມື່ອຍ.
+ເລືອກເທີໃນວັນທີ່ຮ້ອງໄຫ້ ແລະວັນທີ່ຍິ້ມ.
+ເລືອກເທີ… ທຸກມື້ 💗`,
+        },
+
+        {
+          img: "card9.png",
+          text: `ຄືນໃດທີ່ເທີຄິດຫຼາຍ…
+ຂໍໃຫ້ເທີຈື່ຈຳໄວ້ວ່າ ເຂົາຢູ່ນີ້.
+ບໍ່ໄດ້ເກັ່ງທຸກຢ່າງ
+ແຕ່ຈະເກັ່ງໃນການ “ຮັກເທີ” 🤍`,
+        },
+
+        {
+          img: "card12.png",
+          text: `ຂອບໃຈທີ່ຢູ່ຂ້າງກັນ…
+ຂອບໃຈທີ່ໃຫ້ເຂົາໄດ້ຮັກ
+ຂອບໃຈທີ່ເຂົ້າໃຈເຂົາໃນວັນທີ່ເຂົາບໍ່ເຂົ້າໃຈຕົວເອງ
+3 ປີນີ້… ມີຄວາມຫມາຍຫຼາຍ ❤️`,
+        },
+
+        {
+          img: "card13.png",
+          text: `ຂໍໃຫ້ອະນາຄົດຂອງພວກເຮົາ
+ມີກາເຟໃນຕອນເຊົ້າ,
+ມີຮອຍຍິ້ມໃນຕອນແລງ,
+ແລະມີການຈັບມືກັນໃນທຸກຕອນ 🤍
+ເຂົາຢາກຢູ່ນຳເທີດົນໆ`,
+        },
+
+        {
+          img: "card14.png",
+          text: `ຢາກໄປຫຼີ້ນກັບເທີຕະຫຼອດ… 🥹❤️
+ຢາກໃຫ້ທູຸກທິບທີ່ໄດ້ທ່ອງທ່ຽວມີເທີ
+ຢາກໃຫ້ເທີໄປຫຼີ້ນນຳກັນທຸກທິບເລີຍ 😝`,
+        },
+
+        {
+          tag: "ຮັກຫຼາຍ ❤️",
+          img: "card15.png",
+          text: `${herName}… ເຂົາບໍ່ສັນຍາວ່າເຂົາຈະເປັນຄົນທີ່ດີທີ່ສຸດ ແຕ່ເຂົາ....... ❤️
+ຈະຮັກເທີໃຫ້ຫຼາຍຂຶ້ນທຸກມື້
+ຈະຟັງເທີໃຫ້ຫຼາຍຂຶ້ນ
+ຈະຢູ່ຂ້າງໆໃນມື້ທີ່ມີບັນຫາ
+ແລະຈະຈັບມືກັນໄປ… ອີກດົນໆ 
+Anh yêu em!💘`,
+        },
+      ];
+
+      // ===== music =====
+      const bgm = document.getElementById("bgm");
+      const playBtn = document.getElementById("playBtn");
+      async function tryPlay() {
+        try {
+          await bgm.play();
+          playBtn.textContent = "ກຳລັງຫຼິ້ນ 🎶";
+        } catch (e) {
+          playBtn.textContent = "ເລີ່ມເພງ 🎶";
+        }
+      }
+      playBtn.addEventListener("click", async () => {
+        if (bgm.paused) await tryPlay();
+        else {
+          bgm.pause();
+          playBtn.textContent = "ເລີ່ມເພງ 🎶";
+        }
+      });
+
+      // ===== hearts =====
+      const hearts = document.getElementById("hearts");
+      const heartChars = ["💗", "💖", "💕", "💘", "💝", "❤️", "💞"];
+      function spawnHeart() {
+        const h = document.createElement("div");
+        h.className = "heart";
+        h.textContent =
+          heartChars[Math.floor(Math.random() * heartChars.length)];
+        const size = 14 + Math.random() * 24;
+        const left = Math.random() * 100;
+        const duration = 4 + Math.random() * 4;
+        h.style.left = left + "vw";
+        h.style.bottom = "-6vh";
+        h.style.fontSize = size + "px";
+        h.style.animationDuration = duration + "s";
+        hearts.appendChild(h);
+        setTimeout(() => h.remove(), duration * 1000 + 250);
+      }
+      setInterval(spawnHeart, 650);
+      document.getElementById("moreHeartsBtn").addEventListener("click", () => {
+        for (let i = 0; i < 24; i++) setTimeout(spawnHeart, i * 45);
+      });
+
+      // ===== build pages (with typing placeholders) =====
+      const track = document.getElementById("track");
+      const barFill = document.getElementById("barFill");
+      const viewport = document.getElementById("viewport");
+
+      function pageHTML(p, i, total) {
+  const safeTag = p.tag || "";
+  const safeTitle = p.title || "";
+
+  return `
+    <div class="page">
+      <div class="card" id="card_${i}">
+        <div class="photo" id="photo_${i}">
+          <img src="${p.img}" alt=""
+            onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22600%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23f4f4f4%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2232%22 font-family=%22Arial%22>ໃສ່ຮູບ: ${p.img}</text></svg>';"/>
+        </div>
+
+        <div class="content">
+          <div class="badgeRow">
+            <span class="badge" style="${safeTag ? "" : "display:none"}">${safeTag}</span>
+            <span class="pageNo">${i + 1} / ${total}</span>
+          </div>
+
+          <h3 class="title" style="${safeTitle ? "" : "display:none"}">${safeTitle}</h3>
+
+          <div class="textBox">
+            <p class="typing" id="typing_${i}"></p><span class="caret" id="caret_${i}"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+      
+      track.innerHTML = pages
+        .map((p, i) => pageHTML(p, i, pages.length))
+        .join("");
+
+      // ===== navigation + swipe =====
+      let idx = 0;
+
+      // typing control
+      let typingTimer = null;
+      let typingPos = 0;
+      let typingText = "";
+
+      function stopTyping() {
+        if (typingTimer) clearInterval(typingTimer);
+        typingTimer = null;
+      }
+
+      function startTypingFor(i) {
+        stopTyping();
+        const el = document.getElementById(`typing_${i}`);
+        const caret = document.getElementById(`caret_${i}`);
+
+        // reset all carets (hide others)
+        for (let k = 0; k < pages.length; k++) {
+          const c = document.getElementById(`caret_${k}`);
+          if (c) c.style.display = k === i ? "inline-block" : "none";
+        }
+
+        el.textContent = "";
+        typingPos = 0;
+        typingText = pages[i].text;
+
+        // speed (ปรับได้)
+        const speedMs = 14; // ยิ่งน้อยยิ่งเร็ว
+        typingTimer = setInterval(() => {
+          typingPos += 1;
+          el.textContent = typingText.slice(0, typingPos);
+
+          // auto scroll within page if text gets long (optional)
+          // (not needed here because layout is fixed)
+
+          if (typingPos >= typingText.length) {
+            stopTyping();
+            caret.style.display = "none";
+          }
+        }, speedMs);
+      }
+
+      function skipTyping() {
+        stopTyping();
+        const el = document.getElementById(`typing_${idx}`);
+        const caret = document.getElementById(`caret_${idx}`);
+        el.textContent = pages[idx].text;
+        caret.style.display = "none";
+      }
+      document.getElementById("skipBtn").addEventListener("click", skipTyping);
+
+      function popPhoto(i) {
+        const ph = document.getElementById(`photo_${i}`);
+        if (!ph) return;
+        ph.classList.remove("pop");
+        // force reflow to restart animation
+        void ph.offsetWidth;
+        ph.classList.add("pop");
+      }
+
+      function setPage(i, withFX = true) {
+        idx = Math.max(0, Math.min(pages.length - 1, i));
+        track.style.transition = "transform .28s ease";
+        track.style.transform = `translateX(${-idx * 100}%)`;
+        barFill.style.width = `${((idx + 1) / pages.length) * 100}%`;
+
+        if (withFX) {
+          popPhoto(idx);
+          for (let k = 0; k < 12; k++) setTimeout(spawnHeart, k * 30);
+        }
+        startTypingFor(idx);
+      }
+
+      document
+        .getElementById("nextBtn")
+        .addEventListener("click", () => setPage(idx + 1));
+      document
+        .getElementById("prevBtn")
+        .addEventListener("click", () => setPage(idx - 1));
+
+      let startX = 0,
+        curX = 0,
+        dragging = false;
+      viewport.addEventListener("pointerdown", (e) => {
+        dragging = true;
+        startX = e.clientX;
+        curX = startX;
+        viewport.setPointerCapture(e.pointerId);
+        track.style.transition = "none";
+        stopTyping(); // pause while dragging
+      });
+      viewport.addEventListener("pointermove", (e) => {
+        if (!dragging) return;
+        curX = e.clientX;
+        const dx = curX - startX;
+        const percent = (dx / viewport.clientWidth) * 100;
+        track.style.transform = `translateX(${-idx * 100 + percent}%)`;
+      });
+      viewport.addEventListener("pointerup", () => {
+        if (!dragging) return;
+        dragging = false;
+        const dx = curX - startX;
+        const threshold = viewport.clientWidth * 0.18;
+        if (dx < -threshold) setPage(idx + 1);
+        else if (dx > threshold) setPage(idx - 1);
+        else setPage(idx, false);
+      });
+
+      // ===== start flow =====
+      const start = document.getElementById("start");
+      const reader = document.getElementById("reader");
+      document
+        .getElementById("startBtn")
+        .addEventListener("click", async () => {
+          for (let i = 0; i < 28; i++) setTimeout(spawnHeart, i * 25);
+          await tryPlay();
+          start.style.display = "none";
+          reader.classList.add("show");
+          barFill.style.width = `${(1 / pages.length) * 100}%`;
+          setPage(0, true);
+        });
+    </script>
+  </body>
+</html>
